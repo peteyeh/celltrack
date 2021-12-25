@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 
+def apply_blur(image, kernel_size=5):
+    return cv2.GaussianBlur(image, (kernel_size,kernel_size), cv2.BORDER_DEFAULT)
+
 def apply_canny(image, threshold1=100, threshold2=230):
     return cv2.Canny(np.uint8(image), threshold1=threshold1, threshold2=threshold2)
 
