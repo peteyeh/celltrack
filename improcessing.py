@@ -11,6 +11,10 @@ def apply_closure(image, kernel_size=5):
     kernel = np.ones((kernel_size,kernel_size),np.uint8)
     return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
 
+def apply_contrast(image, factor=2):
+    peak = cv2.calcHist([image], [0], None, [256], [0,256]).argmax()
+    return np.uint8(np.clip((factor*(np.float64(image)-peak)) + peak, 0, 255))
+
 def apply_denoise(image, h=3):
     return cv2.fastNlMeansDenoising(image, h=h)
 
