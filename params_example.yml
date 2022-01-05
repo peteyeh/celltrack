@@ -1,0 +1,63 @@
+mode: "thresh_manual"
+
+params:
+  ##################################################
+  ###### PREPROCESSING #############################
+  ### set to 0 to disable ########################## 
+
+  invert_image: True
+
+  denoise_pre: 3
+
+  # background separation
+  contrast: 100  # contrast boosting factor
+  offset: -5     # manually +/- more background
+  preserve_background: False
+
+  # histogram equalization
+  clipLimit: 0   # contrast limit for clipping
+
+  denoise_post: 0
+
+  ##################################################
+
+  ##################################################
+  ###### BINARIZATION MODE #########################
+  ### set `mode` to one of the following ###########
+  ### other params will be ignored* ################
+
+  # "background_filter"
+  lower_width: 10  # distances from peak
+  upper_width: 10
+
+  # "edge_canny"
+  'canny_thresh1': 30   # lower values are ignored
+  'canny_thresh2': 210  # middle values considered if
+                        # connected to upper values
+
+  # "edge_sobel"
+  sobel_ks: 5
+
+  # "kmeans"
+  attempts: 10  # number of times to repeat
+
+  # "thresh_adaptive"
+  thresh_ks: 151
+  C: 8
+
+  # "thresh_otsu"
+  # No params needed
+
+  # "thresh_manual"
+  manual_threshold: 1
+
+  ##################################################
+
+  # size threshold
+  size_thresh: 25
+
+  # unmask areas without edges
+  canny_unmasking: False
+
+  # image closure kernel size
+  closure_ks: 2
