@@ -50,3 +50,6 @@ def apply_sobel(image, kernel_size=5):
 # connectivity: 4 to exclude diagonals, 8 to include
 def get_num_components(image, connectivity=8):
     return cv2.connectedComponentsWithStats(image, connectivity)[0] - 1
+
+def scale_image(image, max_value=255):
+    return np.uint8(np.float64(image) * max_value / image.max())
