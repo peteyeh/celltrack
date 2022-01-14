@@ -1,7 +1,7 @@
 mode: "thresh_manual"
 
 params:
-  denoise_pre: 2
+  denoise_pre: 3
 
   # background separation
   contrast: 10

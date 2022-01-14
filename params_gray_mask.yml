@@ -8,11 +8,15 @@ params:
 
   # background separation
   contrast: 100
-  offset: -4
+  offset: -11
   preserve_background: False
 
   manual_threshold: 1
 
   size_thresh: 25
+
+  canny_unmasking:
+  - 130
+  - 180
 
   closure_ks: 2

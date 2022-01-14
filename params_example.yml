@@ -57,7 +57,9 @@ params:
   size_thresh: 25
 
   # unmask areas without edges
-  canny_unmasking: False
+  canny_unmasking:
+  - 130
+  - 180
 
   # image closure kernel size
   closure_ks: 2

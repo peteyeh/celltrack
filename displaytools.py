@@ -1,4 +1,10 @@
 import matplotlib.pyplot as plt
+
+def display_hist(image):
+    plt.hist(image.ravel(), bins=255)
+    plt.xlim([0,255])
+    plt.show()
+    plt.close()
             
 def display_image(image, dpi=240):
     plt.figure(dpi=dpi)
