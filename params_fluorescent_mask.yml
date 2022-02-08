@@ -6,7 +6,7 @@ params:
 
   # background separation
   contrast: 10
-  offset: -3
+  offset: -12
   preserve_background: False
 
   manual_threshold: 1
