@@ -1,0 +1,16 @@
+mode: "thresh_manual"
+
+params:
+
+  denoise_pre: 5
+
+  # background separation
+  contrast: 100
+  offset: -20
+  preserve_background: False
+
+  manual_threshold: 1
+
+  size_thresh: 25
+  
+  border_removal: 2
