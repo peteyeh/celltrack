@@ -16,3 +16,5 @@ params:
   - 180
 
   border_removal: 2
+
+  closure_ks: 12
