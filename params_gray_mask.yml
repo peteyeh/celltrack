@@ -9,12 +9,12 @@ params:
   thresh_ks: 151
   C: 8
 
-  size_thresh: 40
-
   canny_unmasking:
   - 130
   - 180
 
   border_removal: 2
 
-  closure_ks: 12
+  closure_ks: 8
+
+  size_thresh: 250
