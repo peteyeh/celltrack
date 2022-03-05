@@ -1,4 +1,4 @@
-mode: "thresh_adaptive"
+mode: "thresh_manual"
 
 params:
 
@@ -6,15 +6,19 @@ params:
 
   denoise_pre: 3
 
-  thresh_ks: 151
-  C: 8
+  # background separation
+  contrast: 100
+  offset: -12
+  preserve_background: False
+
+  manual_threshold: 1
 
   canny_unmasking:
   - 130
   - 180
 
-  border_removal: 2
+  closure_ks: 2
 
-  closure_ks: 8
+  border_removal: 1
 
-  size_thresh: 250
+  size_thresh: 30

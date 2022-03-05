@@ -61,5 +61,8 @@ params:
   - 130
   - 180
 
+  # remove border pixels
+  border_removal: 2
+
   # image closure kernel size
   closure_ks: 2
