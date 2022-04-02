@@ -42,11 +42,15 @@ def extract_features(image, mask_image):
     # masks - our sample order will match the labels in mask_labels
     return pd.DataFrame.from_dict(features).set_index(['x', 'y']), mask_labels
 
-def get_mask_image(image, param_path, verbosity=0):
-    with open(param_path, 'r') as f:
-        param_file = yaml.load(f, Loader=yaml.FullLoader)
-        mode = param_file['mode']
-        params = param_file['params']
+def get_mask_image(image, mask_params, verbosity=0):
+    if type(mask_params) == str:
+        with open(param_path, 'r') as f:
+            param_file = yaml.load(f, Loader=yaml.FullLoader)
+            mode = param_file['mode']
+            params = param_file['params']
+    else:
+        mode = mask_params['mode']
+        params = mask_params['params']
 
     if verbosity:
         print("Using mode '%s'." % mode)
