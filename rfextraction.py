@@ -44,7 +44,7 @@ def extract_features(image, mask_image):
 
 def get_mask_image(image, mask_params, verbosity=0):
     if type(mask_params) == str:
-        with open(param_path, 'r') as f:
+        with open(mask_params, 'r') as f:
             param_file = yaml.load(f, Loader=yaml.FullLoader)
             mode = param_file['mode']
             params = param_file['params']
@@ -158,11 +158,6 @@ def get_mask_image(image, mask_params, verbosity=0):
 
     ### IMAGE POSTPROCESSING ###
     
-    if params.get('canny_unmasking'):
-        if verbosity:
-            print("Unmasking areas without edges using Canny%s:" % params.get('canny_unmasking'))
-        binarized = binarized & canny_filled  # POSSIBLE BUG: CHECK IF CANNY_FILLED IS BINARY
-    
     if params.get('border_removal'):
         if verbosity:
             print("Removing border of %i pixels." % params['border_removal'])
@@ -178,14 +173,17 @@ def get_mask_image(image, mask_params, verbosity=0):
     else:
         filled = apply_imfill(binarized)
 
-    if params.get('size_thresh'):
+    if params.get('canny_unmasking') or params.get('size_thresh'):
         if verbosity:
-            print("Unmasking regions smaller than %i pixels." % params['size_thresh'])
+            if params.get('canny_unmasking'):
+                print("Unmasking areas without edges using Canny%s:" % params.get('canny_unmasking'))
+            if params.get('size_thresh'):
+                print("Unmasking regions smaller than %i pixels." % params['size_thresh'])
         _, labelled, stats, _ = cv2.connectedComponentsWithStats(filled, connectivity=8)
         for i in range(1, len(stats)):  # index 0 is the background component
-            size = stats[i, -1]
-            if size < params['size_thresh']:
-                filled = filled * (1 - np.uint8(labelled == i))
+            if (params.get('canny_unmasking') and np.sum(np.uint8(labelled==i)*canny_filled) == 0) \
+                or (params.get('size_thresh') and stats[i, -1] < params['size_thresh']):
+                    filled = filled * (1 - np.uint8(labelled == i))
 
     if verbosity >= 2:
         display_image_array([image, binarized, filled],
