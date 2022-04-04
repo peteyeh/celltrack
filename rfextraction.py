@@ -69,7 +69,8 @@ def get_mask_image(image, mask_params, verbosity=0):
     if params.get('canny_unmasking'):
         enhanced = apply_contrast(image, 2)  # hard-coded factor
         canny = apply_canny(enhanced, *params.get('canny_unmasking'))
-        canny_filled = apply_imfill(apply_closure(canny, 5))
+        # Binarize this so that we can apply operations on it later
+        canny_filled = np.uint8(apply_imfill(apply_closure(canny, 5)) != 0)
         
     ### IMAGE PREPROCESSING ###
     
