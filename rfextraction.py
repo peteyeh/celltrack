@@ -206,3 +206,30 @@ def initialize_extractor():
                                          'SumSquares'],
                                    glszm=[], glrlm=[], ngtdm=[], gldm=[])
     return extractor
+
+# Note that we cannot simply return mask_image here because we don't apply closure
+# when testing total_area.
+def refine_offset(image, mask_params='params_gray_mask.yml', left=5, right=5):
+    if type(mask_params) == str:
+        with open(mask_params, 'r') as f:
+            param_file = yaml.load(f, Loader=yaml.FullLoader)
+            mode = param_file['mode']
+            base_params = param_file['params']
+    else:
+        mode = mask_params['mode']
+        base_params = mask_params['params']
+
+    params = base_params.copy()
+    if params.get('closure_ks'):
+        del params['closure_ks']
+
+    search_range = range(base_params['offset']-left, base_params['offset']+right+1)
+
+    total_area = []
+    for offset in search_range:
+        params['offset'] = offset
+        mask_image = get_mask_image(image, {'mode': mode, 'params': params})
+        total_area += [np.sum((mask_image != 0).astype(int)),]
+
+    base_params['offset'] = search_range[np.where(np.diff(total_area) > 10000)[0][0]]
+    return {'mode': mode, 'params': base_params}

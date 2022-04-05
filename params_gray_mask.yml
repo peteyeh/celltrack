@@ -8,7 +8,7 @@ params:
 
   # background separation
   contrast: 100
-  offset: -12
+  offset: -5
   preserve_background: False
 
   manual_threshold: 1
@@ -21,4 +21,4 @@ params:
 
   border_removal: 1
 
-  size_thresh: 30
+  size_thresh: 50
