@@ -1,5 +1,6 @@
 __pycache__/
+__temp*
 .*
 *.m
-saved_images*
+saved_output*
 source_images*
