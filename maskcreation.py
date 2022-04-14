@@ -199,8 +199,8 @@ if __name__ == "__main__":
             raise Exception()
     except:
         print("Unable to read image stack. Make sure you execute with:")
-        print("  python3 [image_path]")
-        sys.exit()
+        print("  python3 maskcreation.py [image_path]")
+        sys.exit(1)
 
     print("Creating %i mask images:" % len(image_stack))
     mask_images = \
