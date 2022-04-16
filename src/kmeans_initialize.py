@@ -1,4 +1,4 @@
-import numpy as np
+import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import pickle
@@ -9,38 +9,39 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 
-def find_k(df):
-    silhouette_scores = []
-    for k in range(2, 15):
-        kmeans = KMeans(n_clusters=k, random_state=0)
-        labels = kmeans.fit_predict(df)
-        silhouette_scores += [silhouette_score(df, labels),]
-    return np.argmax(silhouette_scores[1:]) + 3  # [1:] means we start at k = 3
-
 if __name__ == "__main__":
-    try:
-        feature_path = "__temp-" + os.path.basename(sys.argv[1]).split('.')[0] + "-extracted_features.pickle"
+    with open(os.path.basename(sys.argv[1]), "rb") as infile:
+        image_paths = map(lambda a: a.decode(), infile.read().splitlines())
+
+    full_df = pd.DataFrame()
+    for p in image_paths:
+        feature_path = "__temp-" + os.path.basename(p).split('.')[0] + "-extracted_features.pickle"
         with open(feature_path, "rb") as infile:
-            df, _ = pickle.load(infile)[int(sys.argv[2])]
-            print("Loaded DataFrame from " + feature_path + ".")
-        k = int(sys.argv[3]) if len(sys.argv) == 4 else None
-    except:
-        print("Received invalid parameters. Make sure ftextraction.py has been run and that you execute with:")
-        print("  python3 kmeans_initialize.py [image_path] [index] (k)")
-        print("If k is not given it will automatically be chosen.")
-        sys.exit(1)
+            for df, _ in pickle.load(infile):
+                full_df = full_df.append(df)
 
     scaler = StandardScaler()
     pca = PCA(n_components='mle')
 
-    scaled = scaler.fit_transform(df)
-    dft = pd.DataFrame(pca.fit_transform(scaled), index=df.index)
-    if k is None:
-        k = find_k(dft)
-    kmeans = KMeans(n_clusters=k, random_state=0)
+    scaled = scaler.fit_transform(full_df)
+    dft = pd.DataFrame(pca.fit_transform(scaled), index=full_df.index)
+
+    silhouette_scores = []
+    k_range = range(2, 15)
+    for k in k_range:
+        kmeans = KMeans(n_clusters=k, random_state=0)
+        labels = kmeans.fit_predict(dft)
+        silhouette_scores += [silhouette_score(dft, labels),]
+
+    plt.plot(k_range, silhouette_scores,'bx-')
+    plt.title("Silhouette Scores")
+    plt.xlabel("k")
+    plt.show()
+
+    kmeans = KMeans(n_clusters=int(input("Selected k: ")), random_state=0)
     kmeans.fit(dft)
 
-    write_path = "__temp-" + os.path.basename(sys.argv[1]).split('.')[0] + "-kmeans.pickle"
+    write_path = "trained-kmeans.pickle"
     print("Writing trained models to " + write_path + ".")
     with open(write_path, "wb") as outfile:
         pickle.dump([scaler, pca, kmeans], outfile)
