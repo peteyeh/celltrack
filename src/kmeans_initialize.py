@@ -26,22 +26,24 @@ if __name__ == "__main__":
     scaled = scaler.fit_transform(full_df)
     dft = pd.DataFrame(pca.fit_transform(scaled), index=full_df.index)
 
-    silhouette_scores = []
-    k_range = range(2, 15)
-    for k in k_range:
-        kmeans = KMeans(n_clusters=k, random_state=0)
-        labels = kmeans.fit_predict(dft)
-        silhouette_scores += [silhouette_score(dft, labels),]
+    if len(sys.argv) > 2:
+        k = sys.argv[2]
+        kmeans = KMeans(n_clusters=int(input("Selected k: ")), random_state=0)
+        kmeans.fit(dft)
 
-    plt.plot(k_range, silhouette_scores,'bx-')
-    plt.title("Silhouette Scores")
-    plt.xlabel("k")
-    plt.show()
+        write_path = "trained-kmeans.pickle"
+        print("Writing trained models to " + write_path + ".")
+        with open(write_path, "wb") as outfile:
+            pickle.dump([scaler, pca, kmeans], outfile)
+    else:
+        silhouette_scores = []
+        k_range = range(2, 15)
+        for k in k_range:
+            kmeans = KMeans(n_clusters=k, random_state=0)
+            labels = kmeans.fit_predict(dft)
+            silhouette_scores += [silhouette_score(dft, labels),]
 
-    kmeans = KMeans(n_clusters=int(input("Selected k: ")), random_state=0)
-    kmeans.fit(dft)
-
-    write_path = "trained-kmeans.pickle"
-    print("Writing trained models to " + write_path + ".")
-    with open(write_path, "wb") as outfile:
-        pickle.dump([scaler, pca, kmeans], outfile)
+        plt.plot(k_range, silhouette_scores,'bx-')
+        plt.title("Silhouette Scores")
+        plt.xlabel("k")
+        plt.savefig("silhouette_scores.png")

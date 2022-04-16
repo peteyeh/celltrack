@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --account=b1042 
+#SBATCH --account=b1042
 #SBATCH --partition=genomics
 #SBATCH --nodes=1
 #SBATCH --n=52
