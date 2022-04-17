@@ -13,23 +13,25 @@ module load python/anaconda3.6
 
 source activate celltrack
 
+output="/projects/b1042/Abazeed_Lab/Pete_Priyanka/output"
+
 cd ~/celltrack/src
 
 input="manifest.txt"
 
 while read path; do
   echo "Running maskcreation.py for $path."
-  python3 maskcreation.py $path
+  python3 maskcreation.py $path $output
   if [ $? -eq 1 ]; then
     echo "Failed mask creation. Aborting."
     exit
   fi
   echo "Running ftextraction.py for $path."
-  python3 ftextraction.py $path
+  python3 ftextraction.py $path $output
   if [ $? -eq 1 ]; then
     echo "Failed feature extraction. Aborting."
     exit
   fi
 done < $input
 
-python3 kmeans_initialize.py $input
+python3 kmeans_initialize.py $input $output

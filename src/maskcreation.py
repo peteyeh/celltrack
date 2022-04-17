@@ -201,6 +201,7 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=5
 
 if __name__ == "__main__":
     import imageio, os, shutil, sys
+    from datetime import datetime
     from joblib import cpu_count, delayed, Parallel
     from tqdm import tqdm
 
@@ -213,7 +214,7 @@ if __name__ == "__main__":
             raise Exception()
     except:
         print("Unable to read image stack. Make sure you execute with:")
-        print("  python3 maskcreation.py [image_path]")
+        print("  python3 maskcreation.py image_path [output_path]")
         sys.exit(1)
 
     print("Creating %i mask images:" % len(image_stack))
@@ -221,10 +222,14 @@ if __name__ == "__main__":
         Parallel(n_jobs=cpu_count())(
             delayed(get_mask_image_with_refined_offset)(_) for _ in tqdm(image_stack))
 
-    write_path = "__temp-" + os.path.basename(sys.argv[1]).split('.')[0] + "-mask_images"
+    out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
+    base_path = os.path.join(outpath, os.path.basename(sys.argv[1]).split('.')[0])
+    if not os.path.exists(base_path):
+        print("Creating base directory %s." % base_path)
+        os.mkdir(base_path)
+    write_path = os.path.join(base_path, datetime.now().strftime("%Y%m%d%H%M%S"), "mask_images")
     print("Writing mask images to " + write_path + ":")
-    if os.path.exists(write_path):
-        shutil.rmtree(write_path)
+    os.mkdir(os.path.split(write_path)[0])
     os.mkdir(write_path)
     for i in tqdm(range(len(mask_images))):
         imageio.imwrite((write_path + "/%i.png" % i), mask_images[i])

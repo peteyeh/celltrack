@@ -64,11 +64,15 @@ if __name__ == "__main__":
         image_stack = cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]
     except:
         print("Unable to read image stack. Make sure you execute with:")
-        print("  python3 ftextraction.py [image_path]")
+        print("  python3 ftextraction.py image_path [output_path]")
         sys.exit(1)
 
+    out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
+
     try:
-        mask_path = "__temp-" + os.path.basename(sys.argv[1]).split('.')[0] + "-mask_images"
+        base_path = os.path.join(out_path, os.path.basename(sys.argv[1]).split('.')[0])
+        last_run = sorted(os.listdir(base_path), reverse=True)[0]
+        mask_path = os.path.join(base_path, last_run, "mask_images")
         mask_images = [cv2.imread(_, flags=cv2.IMREAD_GRAYSCALE) for _ in sorted(glob.glob(mask_path + "/*.png"))]
     except:
         print("Unable to find mask images. Did you run maskcreation.py?")
@@ -85,7 +89,7 @@ if __name__ == "__main__":
         Parallel(n_jobs=cpu_count())(
             delayed(extract_features)(*_) for _ in tqdm(zip(image_stack, mask_images)))
 
-    write_path = "__temp-" + os.path.basename(sys.argv[1]).split('.')[0] + "-extracted_features.pickle"
+    write_path = os.path.join(base_path, last_run, "extracted_features.pickle")
     print("Writing extracted features to " + write_path + ".")
     with open(write_path, "wb") as outfile:
         pickle.dump(result, outfile)
