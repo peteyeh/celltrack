@@ -39,6 +39,10 @@ def extract_features(image, mask_image):
 def initialize_extractor():
     extractor = featureextractor.RadiomicsFeatureExtractor()
     # Enable everything but shape (3D) and glcm.SumAverage
+    # NOTE: 'Imc2' seems to cause a "RuntimeWarning: invalid value encountered in sqrt" in stderr.
+    # Per pyradiomics docs: "Due to machine precision errors, it is possble that HXY > HXY2,
+    # which would result in returning complex numbers. In these cases, a value of 0 is returned
+    # for IMC2. This is done on a per-angle basis (i.e. prior to any averaging)."
     extractor.disableAllFeatures()
     extractor.enableFeaturesByName(firstorder=[], shape2D=[],
                                    glcm=['Autocorrelation', 'JointAverage', 'ClusterProminence',

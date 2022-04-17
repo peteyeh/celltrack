@@ -2,7 +2,7 @@
 #SBATCH --account=b1042
 #SBATCH --partition=genomics
 #SBATCH --ntasks-per-node=50
-#SBATCH --time=00:40:00
+#SBATCH --time=08:00:00
 #SBATCH --mem-per-cpu=1G
 #SBATCH --job-name=image_analysis
 #SBATCH --output=outlog

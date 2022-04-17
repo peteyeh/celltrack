@@ -1,4 +1,4 @@
 ../source_images/B1_plate1.tiff
 ../source_images/B1_plate3.tiff
 ../source_images/D1_plate1.tiff
-../source_images/D1.plate3.tiff
+../source_images/D1_plate3.tiff

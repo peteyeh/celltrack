@@ -8,6 +8,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
+from tqdm import tqdm
 
 if __name__ == "__main__":
     with open(os.path.basename(sys.argv[1]), "rb") as infile:
@@ -16,9 +17,12 @@ if __name__ == "__main__":
     full_df = pd.DataFrame()
     for p in image_paths:
         feature_path = "__temp-" + os.path.basename(p).split('.')[0] + "-extracted_features.pickle"
+        print("Loading features from %s." % feature_path)
         with open(feature_path, "rb") as infile:
             for df, _ in pickle.load(infile):
                 full_df = full_df.append(df)
+
+    print("%i data points loaded." % len(full_df))
 
     scaler = StandardScaler()
     pca = PCA(n_components='mle')
@@ -28,7 +32,8 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 2:
         k = sys.argv[2]
-        kmeans = KMeans(n_clusters=int(input("Selected k: ")), random_state=0)
+        print("Training kmeans model with k=%i." % k)
+        kmeans = KMeans(n_clusters=k, random_state=0)
         kmeans.fit(dft)
 
         write_path = "trained-kmeans.pickle"
@@ -38,7 +43,8 @@ if __name__ == "__main__":
     else:
         silhouette_scores = []
         k_range = range(2, 15)
-        for k in k_range:
+        print("Obtaining silhouette scores for k=[%i,%i]." % (k_range[0], k_range[-1]))
+        for k in tqdm(k_range):
             kmeans = KMeans(n_clusters=k, random_state=0)
             labels = kmeans.fit_predict(dft)
             silhouette_scores += [silhouette_score(dft, labels),]
