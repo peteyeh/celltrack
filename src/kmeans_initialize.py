@@ -24,6 +24,10 @@ if __name__ == "__main__":
 
     print("%i data points loaded." % len(full_df))
 
+    if len(full_df) > 40000:
+        print("Downsampling to 40000 data points.")
+        full_df = full_df.sample(40000, random_state=0)
+
     scaler = StandardScaler()
     pca = PCA(n_components='mle')
 
