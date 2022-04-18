@@ -60,7 +60,7 @@ if __name__ == "__main__":
     from joblib import cpu_count, delayed, Parallel
     from tqdm import tqdm
 
-    from improcessing import *
+    from improcessing import scale_image
 
     try:
         image_stack = list(map(scale_image, cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]))

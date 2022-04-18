@@ -6,6 +6,7 @@ from scipy import stats
 
 if __name__ == "__main__":
     import imageio, os, shutil, sys
+    from datetime import datetime
     from joblib import cpu_count, delayed, Parallel
     from tqdm import tqdm
 
@@ -207,14 +208,6 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=1
     return get_mask_image(image, refine_offset(image, mask_params, left, right))
 
 if __name__ == "__main__":
-    import imageio, os, shutil, sys
-    from datetime import datetime
-    from joblib import cpu_count, delayed, Parallel
-    from tqdm import tqdm
-
-    from displaytools import *
-    from improcessing import *
-
     try:
         image_stack = list(map(scale_image, cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]))
         if len(image_stack) == 0:
