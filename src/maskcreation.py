@@ -171,32 +171,39 @@ def get_mask_image(image, mask_params=default_params, verbosity=0):
 
 # Note that we cannot simply return mask_image here because we don't apply closure
 # when testing total_area.
-def refine_offset(image, mask_params=default_params, left=5, right=5):
+def refine_offset(image, mask_params=default_params, left=15, right=5):
     if type(mask_params) == str:
         with open(mask_params, 'r') as f:
             param_file = yaml.load(f, Loader=yaml.FullLoader)
             mode = param_file['mode']
-            base_params = param_file['params']
+            params = param_file['params']
     else:
         mode = mask_params['mode']
-        base_params = mask_params['params']
+        params = mask_params['params']
 
-    params = base_params.copy()
-    if params.get('closure_ks'):
-        del params['closure_ks']
+    search_range = range(params['offset']-left, params['offset']+right+1)
 
-    search_range = range(base_params['offset']-left, base_params['offset']+right+1)
-
-    total_area = []
+    saved_totals = []
+    saved_largests = []
     for offset in search_range:
         params['offset'] = offset
         mask_image = get_mask_image(image, {'mode': mode, 'params': params})
-        total_area += [np.sum((mask_image != 0).astype(int)),]
+        total_area = np.sum((mask_image != 0).astype(int))
+        largest_area = np.max(cv2.connectedComponentsWithStats(mask_image, connectivity=8)[2][1:,-1])
+        if len(saved_totals) > 0:
+            largest_diff = largest_area - saved_largests[-1]
+            total_diff = total_area - saved_totals[-1]
+            # The second conditional here, if true, suggests that we're observing a large increase in
+            # area throughout the image rather than just bridging between large components. A more
+            # accurate but expensive approach would be to take the area of (largest_mask & saved_masks[-1]).
+            if largest_diff > 25000 and largest_diff < total_diff:
+                params['offset'] = offset - 1
+                break
+        saved_totals += [total_area,]
+        saved_largests += [largest_area,]
+    return {'mode': mode, 'params': params}
 
-    base_params['offset'] = search_range[np.where(np.diff(total_area) > 10000)[0][0]]
-    return {'mode': mode, 'params': base_params}
-
-def get_mask_image_with_refined_offset(image, mask_params=default_params, left=5, right=5):
+def get_mask_image_with_refined_offset(image, mask_params=default_params, left=15, right=5):
     return get_mask_image(image, refine_offset(image, mask_params, left, right))
 
 if __name__ == "__main__":
