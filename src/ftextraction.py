@@ -60,6 +60,8 @@ if __name__ == "__main__":
     from joblib import cpu_count, delayed, Parallel
     from tqdm import tqdm
 
+    from improcessing import *
+
     try:
         image_stack = list(map(scale_image, cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]))
     except:
@@ -70,7 +72,8 @@ if __name__ == "__main__":
     out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
 
     try:
-        base_path = os.path.join(out_path, os.path.basename(sys.argv[1]).split('.')[0])
+        basename = os.path.basename(sys.argv[1]).split('.')[0]
+        base_path = os.path.join(out_path, basename)
         last_run = sorted(os.listdir(base_path), reverse=True)[0]
         mask_path = os.path.join(base_path, last_run, "mask_images")
         mask_images = [cv2.imread(_, flags=cv2.IMREAD_GRAYSCALE) for _ in sorted(glob.glob(mask_path + "/*.png"))]
@@ -79,7 +82,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if len(image_stack) == len(mask_images):
-        print("Matched %i raw images to mask images." % len(image_stack))
+        print("Matched %i raw images to mask images for %s." % (len(image_stack), basename))
     else:
         print("Unable to match mask images (%i) to raw images (%i). Aborting." %
               (len(mask_images), len(image_stack)))

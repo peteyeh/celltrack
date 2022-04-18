@@ -224,13 +224,14 @@ if __name__ == "__main__":
         print("  python3 maskcreation.py image_path [output_path]")
         sys.exit(1)
 
-    print("Creating %i mask images:" % len(image_stack))
+    basename = os.path.basename(sys.argv[1]).split('.')[0]
+    print("Creating %i mask images for %s:" % (len(image_stack), basename))
     mask_images = \
         Parallel(n_jobs=cpu_count())(
             delayed(get_mask_image_with_refined_offset)(_) for _ in tqdm(image_stack))
 
     out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
-    base_path = os.path.join(out_path, os.path.basename(sys.argv[1]).split('.')[0])
+    base_path = os.path.join(out_path, basename)
     if not os.path.exists(base_path):
         print("Creating base directory %s." % base_path)
         os.mkdir(base_path)
