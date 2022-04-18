@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     try:
         with open(mask_path, "rb") as infile:
-            mask_result = pickle.load(infile)
+            mask_result = list(map(lambda a: a[1], pickle.load(infile)))
             print("Loaded feature extraction data from %s." % mask_path)
     except:
         print("Unable to load feature extraction data from %s. Did you run ftextract.py?" % mask_path)
@@ -52,9 +52,12 @@ if __name__ == "__main__":
     	print("Unable to match image stack to saved mask and label data. Aborting.")
     	sys.exit(1)
 
+    print("Creating %i contoured images for %s:" % (len(image_stack), basename))
+    args = zip(image_stack, mask_result, label_result, [get_colormap()]*len(image_stack))
+    contoured_images = Parallel(n_jobs=cpu_count())(delayed(get_contoured_image)(*_) for _ in tqdm(args))
+
     write_path = os.path.join(base_path, last_run, "contoured_images")
     print("Writing mask images to " + write_path + ":")
     os.mkdir(write_path)
-    for i in tqdm(range(len(image_stack))):
-        imageio.imwrite((write_path + "/%i.png" % i),
-                        get_contoured_image(image_stack[i], mask_result[i][1], label_result[i], get_colormap()))
+    for i in tqdm(range(len(contoured_images))):
+        imageio.imwrite((write_path + "/%i.png" % i), contoured_images[i])
