@@ -216,7 +216,7 @@ if __name__ == "__main__":
     from improcessing import *
 
     try:
-        image_stack = cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]
+        image_stack = list(map(scale_image, cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]))
         if len(image_stack) == 0:
             raise Exception()
     except:

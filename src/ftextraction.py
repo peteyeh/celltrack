@@ -61,7 +61,7 @@ if __name__ == "__main__":
     from tqdm import tqdm
 
     try:
-        image_stack = cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]
+        image_stack = list(map(scale_image, cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]))
     except:
         print("Unable to read image stack. Make sure you execute with:")
         print("  python3 ftextraction.py image_path [output_path]")
