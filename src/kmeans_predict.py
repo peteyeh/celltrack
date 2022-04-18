@@ -3,13 +3,15 @@ import pandas as pd
 import pickle
 import sys
 
+from tqdm import tqdm
+
 if __name__ == "__main__":
     out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
 
     try:
         base_path = os.path.join(out_path, "kmeans")
         last_run = sorted(os.listdir(base_path), reverse=True)[0]
-        kmeans_path = os.path.join(base_path, last_run + ".pickle")
+        kmeans_path = os.path.join(base_path, last_run)  # ".pickle" is contained within last_run
 
         base_path = os.path.join(out_path, os.path.basename(sys.argv[1]).split('.')[0])
         last_run = sorted(os.listdir(base_path), reverse=True)[0]
@@ -36,7 +38,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     labels = []
-    for df, _ in result:
+    for df, _ in tqdm(result):
         df = pd.DataFrame(pca.transform(scaler.transform(df)), index=df.index)
         labels += [kmeans.predict(df),]
 

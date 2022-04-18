@@ -223,7 +223,7 @@ if __name__ == "__main__":
             delayed(get_mask_image_with_refined_offset)(_) for _ in tqdm(image_stack))
 
     out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
-    base_path = os.path.join(outpath, os.path.basename(sys.argv[1]).split('.')[0])
+    base_path = os.path.join(out_path, os.path.basename(sys.argv[1]).split('.')[0])
     if not os.path.exists(base_path):
         print("Creating base directory %s." % base_path)
         os.mkdir(base_path)

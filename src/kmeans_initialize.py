@@ -39,8 +39,8 @@ if __name__ == "__main__":
     scaled = scaler.fit_transform(full_df)
     dft = pd.DataFrame(pca.fit_transform(scaled), index=full_df.index)
 
-    if len(sys.argv) > 2:
-        k = sys.argv[2]
+    if len(sys.argv) > 3:
+        k = int(sys.argv[3])
         print("Training kmeans model with k=%i." % k)
         kmeans = KMeans(n_clusters=k, random_state=0)
         kmeans.fit(dft)
