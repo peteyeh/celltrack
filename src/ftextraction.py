@@ -76,7 +76,8 @@ if __name__ == "__main__":
         base_path = os.path.join(out_path, basename)
         last_run = sorted(os.listdir(base_path), reverse=True)[0]
         mask_path = os.path.join(base_path, last_run, "mask_images")
-        mask_images = [cv2.imread(_, flags=cv2.IMREAD_GRAYSCALE) for _ in sorted(glob.glob(mask_path + "/*.png"))]
+        sorted_paths = sorted(glob.glob(mask_path + "/*.png"), key=lambda a: int(os.path.basename(a).split('.')[0]))
+        mask_images = [cv2.imread(_, flags=cv2.IMREAD_GRAYSCALE) for _ in sorted_paths]
     except:
         print("Unable to find mask images. Did you run maskcreation.py?")
         sys.exit(1)
