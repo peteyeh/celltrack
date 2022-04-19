@@ -184,24 +184,16 @@ def refine_offset(image, mask_params=default_params, left=15, right=5):
 
     search_range = range(params['offset']-left, params['offset']+right+1)
 
-    saved_totals = []
-    saved_largests = []
+    prev_mask = None
     for offset in search_range:
         params['offset'] = offset
         mask_image = get_mask_image(image, {'mode': mode, 'params': params})
-        total_area = np.sum((mask_image != 0).astype(int))
-        largest_area = np.max(cv2.connectedComponentsWithStats(mask_image, connectivity=8)[2][1:,-1])
-        if len(saved_totals) > 0:
-            largest_diff = largest_area - saved_largests[-1]
-            total_diff = total_area - saved_totals[-1]
-            # The second conditional here, if true, suggests that we're observing a large increase in
-            # area throughout the image rather than just bridging between large components. A more
-            # accurate but expensive approach would be to take the area of (largest_mask & saved_masks[-1]).
-            if largest_diff > 25000 and largest_diff < total_diff:
+        if prev_mask is not None:
+            mask_diff = mask_image - prev_mask
+            if np.max(cv2.connectedComponentsWithStats(mask_diff, connectivity=8)[2][1:,-1]) > 2000:
                 params['offset'] = offset - 1
                 break
-        saved_totals += [total_area,]
-        saved_largests += [largest_area,]
+        prev_mask = mask_image
     return {'mode': mode, 'params': params}
 
 def get_mask_image_with_refined_offset(image, mask_params=default_params, left=15, right=5):
