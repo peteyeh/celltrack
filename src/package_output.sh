@@ -16,4 +16,5 @@ while read path; do
   mkdir $package_path/$filename
   cp $output_path/*.png $package_path/$filename
   cp -r $output_path/mask_images $package_path/$filename
+  cp -r $output_path/contoured_images $package_path/$filename
 done < $input
