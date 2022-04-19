@@ -4,6 +4,7 @@ import os
 import pickle
 import sys
 
+from joblib import cpu_count, delayed, Parallel
 from tqdm import tqdm
 
 from colormap import get_colormap
@@ -14,7 +15,8 @@ if __name__ == "__main__":
     out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
 
     try:
-        base_path = os.path.join(out_path, os.path.basename(sys.argv[1]).split('.')[0])
+        basename = os.path.basename(sys.argv[1]).split('.')[0]
+        base_path = os.path.join(out_path, basename)
         last_run = sorted(os.listdir(base_path), reverse=True)[0]
         mask_path = os.path.join(base_path, last_run, "extracted_features.pickle")
         label_path = os.path.join(base_path, last_run, "labels.pickle")

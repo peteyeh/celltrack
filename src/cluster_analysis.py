@@ -85,7 +85,7 @@ if __name__ == "__main__":
     plt.xlabel("Frame")
     plt.xlim([0,len(sorted_data[0][0])])
     for c, k, _, _ in sorted_data:
-        handles += [plt.bar(range(len(c)), c, bottom=bottom, color=colormap.get_color(k)),]
+        handles += [plt.bar(range(len(c)), c, bottom=bottom, color=get_color(k)),]
         bottom += c
     plt.legend(reversed(handles),
                [("Class %i: %.2f [%.2f]" % a[1:]) for a in reversed(sorted_data)],
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     plt.xlabel("Frame")
     plt.xlim([0,len(sorted_data[0][0])])
     for k in range(len(counts)):
-        plt.plot(counts[k], color=colormap.get_color(k),
+        plt.plot(counts[k], color=get_color(k),
                  label=("Class %i: %.2f [%.2f]" % (k, np.mean(counts[k]), np.std(counts[k]))))
     plt.legend(title="Mean [Std Dev]")
     write_path = os.path.join(base_path, last_run, "class_counts_lineplot.png")
@@ -114,12 +114,12 @@ if __name__ == "__main__":
     ax1.set_ylabel("Pixel Count")
     ax1.set_xlabel("Frame")
     for k in range(len(mean_sizes)):
-        ax1.plot(mean_sizes[k], color=colormap.get_color(k), label=("Class %i" % k))
+        ax1.plot(mean_sizes[k], color=get_color(k), label=("Class %i" % k))
     ax2.set_title("Total Area: Mean [Std Dev]")
     ax2.set_ylabel("Pixel Count")
     ax2.set_xlabel("Frame")
     for k in range(len(total_sizes)):
-        ax2.plot(total_sizes[k], color=colormap.get_color(k),
+        ax2.plot(total_sizes[k], color=get_color(k),
                  label=("Class %i: %.2f [%.2f]" % (k, *meanstd[k])))
     ax2.legend()
     write_path = os.path.join(base_path, last_run, "class_areas.png")
