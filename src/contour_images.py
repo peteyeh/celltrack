@@ -7,8 +7,7 @@ import sys
 from joblib import cpu_count, delayed, Parallel
 from tqdm import tqdm
 
-from colormap import get_colormap
-from displaytools import get_contoured_image
+from displaytools import get_colormap, get_contoured_image
 from improcessing import scale_image
 
 if __name__ == "__main__":

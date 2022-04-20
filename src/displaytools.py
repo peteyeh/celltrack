@@ -6,6 +6,9 @@ import numpy as np
 from collections import Counter
 from sklearn.manifold import TSNE
 
+colormap = matplotlib.colors.ListedColormap(['yellow', 'red', 'cyan', 'orange', 'green',
+                                             'purple', 'blue', 'magenta', 'lime', 'dodgerblue'])
+
 def display_classifications(image, centroids, labels, cmap=None):
     plt.figure(dpi=240)
     plt.axis('off')
@@ -49,6 +52,12 @@ def draw_contours(image, mask, color='red', filled=False):
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     thickness = -1 if filled else 1
     return cv2.drawContours(image, contours, contourIdx=-1, color=color, thickness=thickness)
+
+def get_colormap():
+    return colormap
+
+def get_color(i):
+    return colormap.colors[i]
 
 def get_contoured_image(image, mask_labels, labels, colormap, filled=False):
     contours = np.full(mask_labels.shape, -1, dtype=int)

@@ -9,7 +9,7 @@ from collections import Counter
 from joblib import cpu_count, delayed, Parallel
 from tqdm import tqdm
 
-from colormap import get_color
+from displaytools import get_color
 
 def esf_parallel(k, labels, mask_labels):
     masks = np.array([np.uint8(mask_labels==idx) for idx in np.where(labels==k)[0]+1])
