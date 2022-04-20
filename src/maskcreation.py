@@ -172,7 +172,7 @@ def get_mask_image(image, mask_params=default_params, verbosity=0):
 
 # Note that we cannot simply return mask_image here because we don't apply closure
 # when testing total_area.
-def refine_offset(image, mask_params=default_params, left=15, right=5):
+def refine_offset(image, mask_params=default_params, left=15, right=5, verbosity=0):
     if type(mask_params) == str:
         with open(mask_params, 'r') as f:
             param_file = yaml.load(f, Loader=yaml.FullLoader)
@@ -184,10 +184,13 @@ def refine_offset(image, mask_params=default_params, left=15, right=5):
 
     search_range = range(params['offset']-left, params['offset']+right+1)
 
+    if verbosity:
+        print("Searching through range %s." % str(search_range))
+
     prev_mask = None
     for offset in search_range:
         params['offset'] = offset
-        mask_image = get_mask_image(image, {'mode': mode, 'params': params})
+        mask_image = get_mask_image(image, {'mode': mode, 'params': params}, verbosity)
         if prev_mask is not None:
             mask_diff = mask_image - prev_mask
             if np.max(cv2.connectedComponentsWithStats(mask_diff, connectivity=8)[2][1:,-1]) > 2000:
@@ -201,9 +204,12 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=1
 
 if __name__ == "__main__":
     try:
-        image_stack = list(map(scale_image, cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]))
+        image_stack = cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]
         if len(image_stack) == 0:
             raise Exception()
+        target_mode = get_mode(image_stack[0])
+        print("Rescaling %i images." % len(image_stack))
+        image_stack = [scale_image(image, mode=target_mode) for image in tqdm(image_stack)]
     except:
         print("Unable to read image stack. Make sure you execute with:")
         print("  python3 maskcreation.py image_path [output_path]")

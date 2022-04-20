@@ -60,10 +60,15 @@ if __name__ == "__main__":
     from joblib import cpu_count, delayed, Parallel
     from tqdm import tqdm
 
-    from improcessing import scale_image
+    from improcessing import get_mode, scale_image
 
     try:
-        image_stack = list(map(scale_image, cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]))
+        image_stack = cv2.imreadmulti(sys.argv[1], flags=cv2.IMREAD_GRAYSCALE)[1]
+        if len(image_stack) == 0:
+            raise Exception()
+        target_mode = get_mode(image_stack[0])
+        print("Rescaling %i images." % len(image_stack))
+        image_stack = [scale_image(image, mode=target_mode) for image in tqdm(image_stack)]
     except:
         print("Unable to read image stack. Make sure you execute with:")
         print("  python3 ftextraction.py image_path [output_path]")
