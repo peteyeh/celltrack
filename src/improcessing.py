@@ -61,7 +61,7 @@ def get_mode(image):
 def get_num_components(image, connectivity=8):
     return cv2.connectedComponentsWithStats(image, connectivity)[0] - 1
 
-def scale_image(image, max_value=255, mode=None):
+def scale_image(image, max_value=255, mode=90):
     image = np.float64(image)
     if mode:
         image -= get_mode(image)
