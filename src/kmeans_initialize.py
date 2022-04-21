@@ -1,3 +1,4 @@
+import gnuplotlib as gp
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
@@ -57,6 +58,8 @@ if __name__ == "__main__":
             kmeans = KMeans(n_clusters=k, random_state=0)
             labels = kmeans.fit_predict(dft)
             silhouette_scores += [silhouette_score(dft, labels),]
+
+        gp.plot((k_range, silhouette_scores, {'with': 'lines'}), terminal="dumb 80,30")
 
         plt.plot(k_range, silhouette_scores,'bx-')
         plt.title("Silhouette Scores")
