@@ -44,9 +44,9 @@ for plate in mapping.keys():
         for i in range(len(mapping[plate])):
             if i >= 0:
                 files = os.listdir(os.path.join(base_path, mapping[plate][i]))
-            tif_pattern = image_stack+tif_sub_pattern
+            full_pattern = image_stack+tif_sub_pattern
             image_paths += \
-                sorted([os.path.join(mapping[plate][i], p) for p in filter(re.compile(tif_pattern).match, files)])
+                sorted([os.path.join(mapping[plate][i], p) for p in filter(re.compile(full_pattern).match, files)])
         image_array = []
         for image_path in image_paths:
             path = os.path.join(base_path, image_path)
