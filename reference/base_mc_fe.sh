@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=b1042
 #SBATCH --partition=genomics
-#SBATCH --ntasks-per-node=50
+#SBATCH --ntasks-per-node=26
 #SBATCH --time=04:00:00
 #SBATCH --mem=32G
 #SBATCH --job-name=BASENAME
