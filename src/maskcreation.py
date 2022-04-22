@@ -170,9 +170,7 @@ def get_mask_image(image, mask_params=default_params, verbosity=0):
 
     return filled
 
-# Note that we cannot simply return mask_image here because we don't apply closure
-# when testing total_area.
-def refine_offset(image, mask_params=default_params, left=15, right=5, verbosity=0):
+def get_mask_image_with_refined_offset(image, mask_params=default_params, left=15, right=5, verbosity=0):
     if type(mask_params) == str:
         with open(mask_params, 'r') as f:
             param_file = yaml.load(f, Loader=yaml.FullLoader)
@@ -189,18 +187,17 @@ def refine_offset(image, mask_params=default_params, left=15, right=5, verbosity
 
     prev_mask = None
     for offset in search_range:
-        params['offset'] = offset
-        mask_image = get_mask_image(image, {'mode': mode, 'params': params}, verbosity)
+        params['offset'] = offset  # keep advancing params['offset'] and roll back if we go too far
+        test_params = params.copy()
+        test_params['closure_ks'] = 4  # test with a different closure
+        mask_image = get_mask_image(image, {'mode': mode, 'params': test_params}, verbosity)
         if prev_mask is not None:
             mask_diff = mask_image - prev_mask
             if np.max(cv2.connectedComponentsWithStats(mask_diff, connectivity=8)[2][1:,-1]) > 2000:
                 params['offset'] = offset - 1
                 break
         prev_mask = mask_image
-    return {'mode': mode, 'params': params}
-
-def get_mask_image_with_refined_offset(image, mask_params=default_params, left=15, right=5):
-    return get_mask_image(image, refine_offset(image, mask_params, left, right))
+    return get_mask_image(image, {'mode': mode, 'params': params}, verbosity)
 
 if __name__ == "__main__":
     try:
