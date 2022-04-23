@@ -185,19 +185,24 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=1
     if verbosity:
         print("Searching through range %s." % str(search_range))
 
-    prev_mask = None
+    prev_true = None
+    prev_test = None
     for offset in search_range:
         params['offset'] = offset  # keep advancing params['offset'] and roll back if we go too far
+        true_mask = get_mask_image(image, {'mode': mode, 'params': params}, verbosity)
         test_params = params.copy()
-        test_params['closure_ks'] = 4  # test with a different closure
-        mask_image = get_mask_image(image, {'mode': mode, 'params': test_params}, verbosity)
-        if prev_mask is not None:
-            mask_diff = mask_image - prev_mask
-            if np.max(cv2.connectedComponentsWithStats(mask_diff, connectivity=8)[2][1:,-1]) > 2000:
-                params['offset'] = offset - 1
-                break
-        prev_mask = mask_image
-    return get_mask_image(image, {'mode': mode, 'params': params}, verbosity)
+        test_params['closure_ks'] = 4
+        del test_params['size_thresh']
+        test_mask = get_mask_image(image, {'mode': mode, 'params': test_params}, verbosity)
+        if prev_true is not None and prev_test is not None:
+            true_diff = true_mask - prev_true
+            test_diff = test_mask - prev_test
+            if np.max(cv2.connectedComponentsWithStats(true_diff, connectivity=8)[2][1:,-1]) > 3000 and \
+               np.max(cv2.connectedComponentsWithStats(test_diff, connectivity=8)[2][1:,-1]) > 3000:
+                return prev_true
+        prev_true = true_mask
+        prev_test = test_mask
+    return true_mask
 
 if __name__ == "__main__":
     try:
