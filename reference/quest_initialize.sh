@@ -16,6 +16,5 @@ conda install -y -c conda-forge tqdm=4.62.3
 conda install -y -c fastai opencv-python-headless=4.5.3.56
 conda install -y pandas=1.3.4
 
-pip install --no-input gnuplotlib
 pip install --no-input pyradiomics==3.0.1
 pip install --no-input scikit-image==0.19.1
