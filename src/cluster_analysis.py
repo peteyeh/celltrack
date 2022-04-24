@@ -70,11 +70,20 @@ if __name__ == "__main__":
         total_sizes[i] = fl_result[:,0]
         mean_sizes[i] = fl_result[:,1]
 
+    ### SAVE OUTPUT AS CSV ###
+    write_path = os.path.join(base_path, last_run, "analysis.csv")
+    save_data = np.concatenate((counts, total_sizes, mean_sizes), axis=1)
+    header = ["count_%i" % i for i in range(counts.shape[1])] + \
+             ["total_area_%i" % i for i in range(total_sizes.shape[1])] + \
+             ["mean_area_%i" % i for i in range(mean_sizes.shape[1])]
+    pd.DataFrame(save_data, columns=header).to_csv(write_path, index=False)
+    print("Saved %s." % write_path)
+
     counts = counts.T
     total_sizes = total_sizes.T
     mean_sizes = mean_sizes.T
 
-    ### PLOT CLASS COUNTS ###
+    ### PLOT CLASS COUNTS  ###
     sorted_data = sorted(zip(counts, list(range(len(counts))),
                          np.mean(counts, axis=1), np.std(counts, axis=1)),
                      key=lambda a: a[0][-1])

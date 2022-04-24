@@ -95,7 +95,14 @@ if __name__ == "__main__":
         Parallel(n_jobs=cpu_count())(
             delayed(extract_features)(*_) for _ in tqdm(zip(image_stack, mask_images)))
 
-    write_path = os.path.join(base_path, last_run, "extracted_features.pickle")
-    print("Writing extracted features to " + write_path + ".")
-    with open(write_path, "wb") as outfile:
+    csv_write_path = os.path.join(base_path, last_run, "data.csv")
+    pickle_write_path = os.path.join(base_path, last_run, "extracted_features.pickle")
+    print("Writing extracted features to " + csv_write_path + " and pickled data to " + pickle_write_path + ".")
+    with open(pickle_write_path, "wb") as outfile:
         pickle.dump(result, outfile)
+    df_list = []
+    for i in range(len(result)):
+        df = result[i][0].reset_index()
+        df['image'] = i
+        df_list += [df.set_index(['image', 'x', 'y']),]
+    pd.concat(df_list).to_csv(csv_write_path)

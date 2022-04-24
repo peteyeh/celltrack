@@ -37,12 +37,22 @@ if __name__ == "__main__":
         print("Unable to load models from %s. Did you run kmeans_initialize.py?" % kmeans_path)
         sys.exit(1)
 
-    labels = []
-    for df, _ in tqdm(result):
-        df = pd.DataFrame(pca.transform(scaler.transform(df)), index=df.index)
-        labels += [kmeans.predict(df),]
+    labels_list = []
+    df_list = []
+    for i in tqdm(range(len(result))):
+        df = result[i][0]
+        transformed_df = pd.DataFrame(pca.transform(scaler.transform(df)), index=df.index)
+        labels = kmeans.predict(transformed_df)
+        labels_list += [labels,]
+        # Save pre-transformed DataFrame for CSV exporting
+        df = df.reset_index()
+        df['image'] = i
+        df['label'] = labels
+        df_list += [df.set_index(['image', 'x', 'y']),]
 
-    write_path = os.path.join(base_path, last_run, "labels.pickle")
-    print("Writing labels to " + write_path + ".")
-    with open(write_path, "wb") as outfile:
-        pickle.dump(labels, outfile)
+    csv_write_path = os.path.join(base_path, last_run, "data_labeled.csv")
+    pickle_write_path = os.path.join(base_path, last_run, "labels.pickle")
+    print("Writing labels to " + pickle_write_path + " and labeled CSV to " + csv_write_path + ".")
+    with open(pickle_write_path, "wb") as outfile:
+        pickle.dump(labels_list, outfile)
+    pd.concat(df_list).to_csv(csv_write_path)

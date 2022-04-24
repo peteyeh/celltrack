@@ -51,4 +51,5 @@ for plate in mapping.keys():
         for image_path in image_paths:
             path = os.path.join(base_path, image_path)
             image_array += [cv2.imread(path, flags=cv2.IMREAD_GRAYSCALE),]
+        print("Writing %s." % (str(plate)+image_stack+".tiff"))
         cv2.imwritemulti(os.path.join(output_dir, str(plate)+image_stack+".tiff"), image_array)

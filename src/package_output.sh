@@ -14,6 +14,7 @@ while read path; do
   echo "Copying from $output_path..."
   echo " ...to $package_path/$filename"
   mkdir $package_path/$filename
+  cp $output_path/*.csv $package_path/$filename
   cp $output_path/*.png $package_path/$filename
   cp -r $output_path/mask_images $package_path/$filename
   cp -r $output_path/contoured_images $package_path/$filename
