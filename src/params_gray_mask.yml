@@ -4,7 +4,7 @@ params:
 
   invert_image: True
 
-  denoise_pre: 3
+  denoise_pre: 5
 
   # background separation
   contrast: 100
@@ -13,12 +13,12 @@ params:
 
   manual_threshold: 1
 
-  canny_unmasking:
-  - 130
-  - 180
+  border_removal: 1
 
   closure_ks: 2
 
-  border_removal: 1
+  size_thresh: 60
 
-  size_thresh: 50
+  canny_unmasking:
+  - 130
+  - 180

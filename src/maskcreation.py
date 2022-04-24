@@ -152,17 +152,20 @@ def get_mask_image(image, mask_params=default_params, verbosity=0):
     else:
         filled = apply_imfill(binarized)
 
-    if params.get('canny_unmasking') or params.get('size_thresh'):
+    # Unmask using size first because it is quicker
+    if params.get('size_thresh'):
         if verbosity:
-            if params.get('canny_unmasking'):
-                print("Unmasking areas without edges using Canny%s:" % params.get('canny_unmasking'))
-            if params.get('size_thresh'):
-                print("Unmasking regions smaller than %i pixels." % params['size_thresh'])
+            print("Unmasking regions smaller than %i pixels." % params['size_thresh'])
+        _, labelled, stats, _ = cv2.connectedComponentsWithStats(filled, connectivity=8)
+        filled = np.uint8(np.isin(labelled, np.where(stats[1:,-1] >= params['size_thresh'])[0]+1))
+
+    if params.get('canny_unmasking'):
+        if verbosity:
+            print("Unmasking areas without edges using Canny%s:" % params.get('canny_unmasking'))
         _, labelled, stats, _ = cv2.connectedComponentsWithStats(filled, connectivity=8)
         for i in range(1, len(stats)):  # index 0 is the background component
-            if (params.get('canny_unmasking') and np.sum(np.uint8(labelled==i)*canny_filled) == 0) \
-                or (params.get('size_thresh') and stats[i, -1] < params['size_thresh']):
-                    filled = filled * (1 - np.uint8(labelled == i))
+            if not np.any(canny_filled[labelled==i]):
+                filled[labelled==i] = 0
 
     if verbosity >= 2:
         display_image_array([image, binarized, filled],
@@ -190,19 +193,42 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=1
     for offset in search_range:
         params['offset'] = offset  # keep advancing params['offset'] and roll back if we go too far
         true_mask = get_mask_image(image, {'mode': mode, 'params': params}, verbosity)
+        if not validate_mask(true_mask):
+            if prev_true is not None:
+                return prev_true
+            continue
+
         test_params = params.copy()
         test_params['closure_ks'] = 4
         del test_params['size_thresh']
         test_mask = get_mask_image(image, {'mode': mode, 'params': test_params}, verbosity)
+        if not validate_mask(test_mask):
+            if prev_true is not None:
+                return prev_true
+            continue
+
         if prev_true is not None and prev_test is not None:
             true_diff = true_mask - prev_true
             test_diff = test_mask - prev_test
-            if np.max(cv2.connectedComponentsWithStats(true_diff, connectivity=8)[2][1:,-1]) > 3000 and \
+            # could also check for num_components > 1 instead of np.any for speed, but this is cleaner
+            if np.any(true_diff) and np.any(test_diff) and \
+               np.max(cv2.connectedComponentsWithStats(true_diff, connectivity=8)[2][1:,-1]) > 3000 and \
                np.max(cv2.connectedComponentsWithStats(test_diff, connectivity=8)[2][1:,-1]) > 3000:
                 return prev_true
+
         prev_true = true_mask
         prev_test = test_mask
     return true_mask
+
+def validate_mask(mask_image):
+    # if nothing is masked or if everything is masked
+    if not np.any(mask_image) or np.all(mask_image):
+        return False
+    largest_area = np.max(cv2.connectedComponentsWithStats(mask_image, connectivity=8)[2][1:,-1])
+    image_area = mask_image.shape[0] * mask_image.shape[1]
+    if largest_area > 0.15 * image_area:
+        return False
+    return True
 
 if __name__ == "__main__":
     try:
