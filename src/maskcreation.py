@@ -212,8 +212,8 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=1
             test_diff = test_mask - prev_test
             # could also check for num_components > 1 instead of np.any for speed, but this is cleaner
             if np.any(true_diff) and np.any(test_diff) and \
-               np.max(cv2.connectedComponentsWithStats(true_diff, connectivity=8)[2][1:,-1]) > 3000 and \
-               np.max(cv2.connectedComponentsWithStats(test_diff, connectivity=8)[2][1:,-1]) > 3000:
+               np.max(cv2.connectedComponentsWithStats(true_diff, connectivity=8)[2][1:,-1]) > 2000 and \
+               np.max(cv2.connectedComponentsWithStats(test_diff, connectivity=8)[2][1:,-1]) > 2000:
                 return prev_true
 
         prev_true = true_mask

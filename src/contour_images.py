@@ -58,7 +58,7 @@ if __name__ == "__main__":
     contoured_images = Parallel(n_jobs=cpu_count())(delayed(get_contoured_image)(*_) for _ in tqdm(args))
 
     write_path = os.path.join(base_path, last_run, "contoured_images")
-    print("Writing mask images to " + write_path + ":")
+    print("Writing contoured images to " + write_path + ":")
     os.mkdir(write_path)
     for i in tqdm(range(len(contoured_images))):
         imageio.imwrite((write_path + "/%i.png" % i), contoured_images[i])
