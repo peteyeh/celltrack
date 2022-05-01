@@ -37,8 +37,12 @@ def apply_imfill(image):
     y_dim, x_dim = image.shape
     mask = np.zeros((y_dim+2,x_dim+2), np.uint8)
     t = cv2.floodFill(t, mask, (0,0), 255)[1]
+    t = cv2.floodFill(t, mask, (0, int(y_dim/2)), 255)[1]
     t = cv2.floodFill(t, mask, (0, y_dim-1), 255)[1]
+    t = cv2.floodFill(t, mask, (int(x_dim/2), 0), 255)[1]
+    t = cv2.floodFill(t, mask, (int(x_dim/2), y_dim-1), 255)[1]
     t = cv2.floodFill(t, mask, (x_dim-1, 0), 255)[1]
+    t = cv2.floodFill(t, mask, (x_dim-1, int(y_dim/2)), 255)[1]
     t = cv2.floodFill(t, mask, (x_dim-1, y_dim-1), 255)[1]
     return image | cv2.bitwise_not(t)
 
