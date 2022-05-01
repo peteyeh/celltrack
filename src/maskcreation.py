@@ -173,7 +173,7 @@ def get_mask_image(image, mask_params=default_params, verbosity=0):
 
     return filled
 
-def get_mask_image_with_refined_offset(image, mask_params=default_params, left=15, right=5, verbosity=0):
+def get_mask_image_with_refined_offset(image, mask_params=default_params, left=20, right=5, verbosity=0):
     if type(mask_params) == str:
         with open(mask_params, 'r') as f:
             param_file = yaml.load(f, Loader=yaml.FullLoader)
@@ -202,7 +202,7 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=1
         test_params['closure_ks'] = 4
         del test_params['size_thresh']
         test_mask = get_mask_image(image, {'mode': mode, 'params': test_params}, verbosity)
-        if not validate_mask(test_mask):
+        if not validate_mask(test_mask, cutoff=0.4):
             if prev_true is not None:
                 return prev_true
             continue
@@ -210,23 +210,24 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=1
         if prev_true is not None and prev_test is not None:
             true_diff = true_mask - prev_true
             test_diff = test_mask - prev_test
+            max_true_diff = np.max(cv2.connectedComponentsWithStats(true_diff, connectivity=8)[2][1:,-1])
+            max_test_diff = np.max(cv2.connectedComponentsWithStats(test_diff, connectivity=8)[2][1:,-1])
             # could also check for num_components > 1 instead of np.any for speed, but this is cleaner
             if np.any(true_diff) and np.any(test_diff) and \
-               np.max(cv2.connectedComponentsWithStats(true_diff, connectivity=8)[2][1:,-1]) > 2000 and \
-               np.max(cv2.connectedComponentsWithStats(test_diff, connectivity=8)[2][1:,-1]) > 2000:
+               (max_true_diff > 10000 or (max_true_diff > 2000 and max_test_diff > 4000)):
                 return prev_true
 
         prev_true = true_mask
         prev_test = test_mask
     return true_mask
 
-def validate_mask(mask_image):
+def validate_mask(mask_image, cutoff=0.15):
     # if nothing is masked or if everything is masked
     if not np.any(mask_image) or np.all(mask_image):
         return False
     largest_area = np.max(cv2.connectedComponentsWithStats(mask_image, connectivity=8)[2][1:,-1])
     image_area = mask_image.shape[0] * mask_image.shape[1]
-    if largest_area > 0.15 * image_area:
+    if largest_area > cutoff * image_area:
         return False
     return True
 
