@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --account=b1042
-#SBATCH --partition=genomics
+#SBATCH --account=p31689
+#SBATCH --partition=short
 #SBATCH --ntasks-per-node=8
 #SBATCH --time=01:00:00
 #SBATCH --mem=32G
@@ -15,7 +15,7 @@ source activate celltrack
 
 cd ~/celltrack/src
 
-output="/projects/b1042/Abazeed_Lab/Pete_Priyanka/output"
+output="/projects/p31689/Image_Analysis/output"
 input="INPUT"
 
 python kmeans_initialize.py $input $output GIVEN_K

@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --account=b1042
-#SBATCH --partition=genomics
-#SBATCH --ntasks-per-node=26
+#SBATCH --account=p31689
+#SBATCH --partition=short
+#SBATCH --ntasks-per-node=51
 #SBATCH --time=04:00:00
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --job-name=BASENAME
 #SBATCH --output=outlog-BASENAME
 #SBATCH --error=errlog-BASENAME
@@ -15,7 +15,7 @@ source activate celltrack
 
 cd ~/celltrack/src
 
-output="/projects/b1042/Abazeed_Lab/Pete_Priyanka/output"
+output="/projects/p31689/Image_Analysis/output"
 input="INPUT"
 
 python maskcreation.py $input $output

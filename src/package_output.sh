@@ -1,5 +1,5 @@
 #!/bin/bash
-output="/projects/b1042/Abazeed_Lab/Pete_Priyanka/output"
+output="/projects/p31689/Image_Analysis/output"
 input="manifest.txt"
 
 saved_time=$(date +"%Y%m%d%H%M%S")
