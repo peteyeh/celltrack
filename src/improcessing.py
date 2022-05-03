@@ -36,15 +36,15 @@ def apply_imfill(image):
     t = image.copy()
     y_dim, x_dim = image.shape
     mask = np.zeros((y_dim+2,x_dim+2), np.uint8)
-    t = cv2.floodFill(t, mask, (0,0), 255)[1]
-    t = cv2.floodFill(t, mask, (0, int(y_dim/2)), 255)[1]
-    t = cv2.floodFill(t, mask, (0, y_dim-1), 255)[1]
-    t = cv2.floodFill(t, mask, (int(x_dim/2), 0), 255)[1]
-    t = cv2.floodFill(t, mask, (int(x_dim/2), y_dim-1), 255)[1]
-    t = cv2.floodFill(t, mask, (x_dim-1, 0), 255)[1]
-    t = cv2.floodFill(t, mask, (x_dim-1, int(y_dim/2)), 255)[1]
-    t = cv2.floodFill(t, mask, (x_dim-1, y_dim-1), 255)[1]
-    return image | cv2.bitwise_not(t)
+    t = cv2.floodFill(t, mask, (0,0), 1)[1]
+    t = cv2.floodFill(t, mask, (0, int(y_dim/2)), 1)[1]
+    t = cv2.floodFill(t, mask, (0, y_dim-1), 1)[1]
+    t = cv2.floodFill(t, mask, (int(x_dim/2), 0), 1)[1]
+    t = cv2.floodFill(t, mask, (int(x_dim/2), y_dim-1), 1)[1]
+    t = cv2.floodFill(t, mask, (x_dim-1, 0), 1)[1]
+    t = cv2.floodFill(t, mask, (x_dim-1, int(y_dim/2)), 1)[1]
+    t = cv2.floodFill(t, mask, (x_dim-1, y_dim-1), 1)[1]
+    return image | (t == 0)  # we can intermingle bits and boolean values here
 
 def apply_sharpen(image):
     kernel = np.array([[0, -1,  0],
@@ -56,6 +56,9 @@ def apply_sharpen(image):
 def apply_sobel(image, kernel_size=5):
     # ddepth=-1 preserves the source depth
     return cv2.Sobel(src=image, ddepth=-1, dx=1, dy=1, ksize=kernel_size)
+
+def binarize_image(image):
+    return np.uint8(image != 0)
 
 # Returns the first mode in the image
 def get_mode(image):

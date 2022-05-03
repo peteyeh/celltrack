@@ -48,7 +48,7 @@ def get_mask_image(image, mask_params=default_params, verbosity=0):
         enhanced = apply_contrast(image, 2)  # hard-coded factor
         canny = apply_canny(enhanced, *params.get('canny_unmasking'))
         # Binarize this so that we can apply operations on it later
-        canny_filled = np.uint8(apply_imfill(apply_closure(canny, 5)) != 0)
+        canny_filled = binarize_image(apply_imfill(apply_closure(canny, 5)))
         
     ### IMAGE PREPROCESSING ###
     
@@ -99,30 +99,30 @@ def get_mask_image(image, mask_params=default_params, verbosity=0):
             print("Applying Canny with thresholds %i and %i." %
                   (params['canny_thresh1'], params['canny_thresh2']))
         image = apply_sharpen(image)
-        binarized = apply_canny(image, params['canny_thresh1'], params['canny_thresh2'])
+        binarized = binarize_image(apply_canny(image, params['canny_thresh1'], params['canny_thresh2']))
     elif mode == "edge_sobel":
         if verbosity:
             print("Applying Sobel with kernel size of %i." % params['sobel_ks'])
         image = apply_sharpen(image)
         sobel = apply_sobel(image, params['sobel_ks'])
-        _, binarized = cv2.threshold(sobel, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        binarized = binarize_image(cv2.threshold(sobel, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1])
     elif mode == "kmeans":
         if verbosity:
             print("Applying k-means with %i attempts." % params['attempts'])
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-        _, labels, _ = cv2.kmeans(np.float32(raw_image.flatten()), 2, None, criteria,
+        _, labels, _ = cv2.kmeans(np.float32(image.flatten()), 2, None, criteria,
                        params['attempts'], cv2.KMEANS_PP_CENTERS)
         binarized = np.uint8(labels.reshape(image.shape))
         if stats.mode(labels.flatten()).mode[0]:
-            binarized = cv2.bitwise_not(binarized)  # POSSIBLE BUG, COMPARE TO (1 - binarized)
+            binarized = np.uint8(binarized == 0)
     elif mode == "thresh_adaptive":
         if verbosity:
             print("Applying adaptive thresholding with kernel size of %i and C=%i." %
                   (params['thresh_ks'], params['C']))
-        binarized = cv2.adaptiveThreshold(image, 255,
-                                          cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                          cv2.THRESH_BINARY_INV,
-                                          params['thresh_ks'], params['C'])
+        binarized = binarize_image(cv2.adaptiveThreshold(image, 255,
+                                                         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                                         cv2.THRESH_BINARY_INV,
+                                                         params['thresh_ks'], params['C']))
     elif mode == "thresh_manual":
         if verbosity:
             print("Manually thresholding on values >=%i." % params['manual_threshold'])
@@ -130,7 +130,8 @@ def get_mask_image(image, mask_params=default_params, verbosity=0):
     elif mode == "thresh_otsu":
         if verbosity:
             print("Applying Otsu's.")
-        _, binarized = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        binarized = binarize_image(cv2.threshold(image, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)[1])
+
     else:
         print("Invalid mask mode, aborting.")
         return None
@@ -199,7 +200,7 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=2
             continue
 
         test_params = params.copy()
-        test_params['closure_ks'] = 4
+        test_params['closure_ks'] = 5
         del test_params['size_thresh']
         test_mask = get_mask_image(image, {'mode': mode, 'params': test_params}, verbosity)
         if not validate_mask(test_mask, cutoff=0.4):
@@ -214,7 +215,7 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=2
             max_test_diff = np.max(cv2.connectedComponentsWithStats(test_diff, connectivity=8)[2][1:,-1])
             # could also check for num_components > 1 instead of np.any for speed, but this is cleaner
             if np.any(true_diff) and np.any(test_diff) and \
-               (max_true_diff > 10000 or (max_true_diff > 2000 and max_test_diff > 4000)):
+               (max_true_diff > 10000 or (max_true_diff > 2000 and max_test_diff > 5000)):
                 return prev_true
 
         prev_true = true_mask
