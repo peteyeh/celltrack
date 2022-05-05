@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     try:
         with open(mask_path, "rb") as infile:
-            mask_result = pickle.load(infile)
+            mask_result = list(map(lambda a: a[1], pickle.load(infile)))
             print("Loaded feature extraction data from %s." % mask_path)
     except:
         print("Unable to load feature extraction data from %s. Did you run ftextract.py?" % mask_path)
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     mean_sizes = np.zeros((len(label_result), nc))
     print("Processing %i sets of label data." % len(label_result))
     for i in tqdm(range(len(label_result))):
-        _, mask_labels = mask_result[i]
+        mask_labels = mask_result[i]
         labels = label_result[i]
 
         c = dict(Counter(labels))

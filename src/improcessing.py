@@ -44,7 +44,7 @@ def apply_imfill(image):
     t = cv2.floodFill(t, mask, (x_dim-1, 0), 1)[1]
     t = cv2.floodFill(t, mask, (x_dim-1, int(y_dim/2)), 1)[1]
     t = cv2.floodFill(t, mask, (x_dim-1, y_dim-1), 1)[1]
-    return image | (t == 0)  # we can intermingle bits and boolean values here
+    return image | (t == 0)  # we can intermingle bits and booleans here, (1 | False) == 1
 
 def apply_sharpen(image):
     kernel = np.array([[0, -1,  0],

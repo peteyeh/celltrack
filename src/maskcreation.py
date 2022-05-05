@@ -248,6 +248,13 @@ if __name__ == "__main__":
         Parallel(n_jobs=cpu_count())(
             delayed(get_mask_image_with_refined_offset)(_) for _ in tqdm(image_stack))
 
+    try:
+        if not np.isin(mask_images, [0,1]).all():
+            raise Exception()
+    except:
+        print("Encountered non-binary value in mask image. Aborting before writing bad masks.")
+        sys.exit(1)
+
     out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
     base_path = os.path.join(out_path, basename)
     if not os.path.exists(base_path):
@@ -258,4 +265,4 @@ if __name__ == "__main__":
     os.mkdir(os.path.split(write_path)[0])
     os.mkdir(write_path)
     for i in tqdm(range(len(mask_images))):
-        imageio.imwrite((write_path + "/%i.png" % i), mask_images[i])
+        imageio.imwrite((write_path + "/%i.png" % i), scale_image(mask_images[i], mode=None))
