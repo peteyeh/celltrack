@@ -5,8 +5,8 @@
 #SBATCH --time=01:00:00
 #SBATCH --mem=32G
 #SBATCH --job-name=kmeans
-#SBATCH --output=outlog-kmeans
-#SBATCH --error=errlog-kmeans
+#SBATCH --output=logs/kmeans.outlog
+#SBATCH --error=logs/kmeans.errlog
 
 module purge all
 module load python/anaconda3.6

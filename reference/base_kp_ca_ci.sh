@@ -5,8 +5,8 @@
 #SBATCH --time=02:00:00
 #SBATCH --mem=32G
 #SBATCH --job-name=BASENAME
-#SBATCH --output=outlog-BASENAME
-#SBATCH --error=errlog-BASENAME
+#SBATCH --output=logs/BASENAME-2.outlog
+#SBATCH --error=logs/BASENAME-2.errlog
 
 module purge all
 module load python/anaconda3.6

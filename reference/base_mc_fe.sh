@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --account=p31689
 #SBATCH --partition=short
-#SBATCH --ntasks-per-node=51
+#SBATCH --ntasks-per-node=26
 #SBATCH --time=04:00:00
-#SBATCH --mem=64G
+#SBATCH --mem=32G
 #SBATCH --job-name=BASENAME
-#SBATCH --output=outlog-BASENAME
-#SBATCH --error=errlog-BASENAME
+#SBATCH --output=logs/BASENAME-1.outlog
+#SBATCH --error=logs/BASENAME-1.errlog
 
 module purge all
 module load python/anaconda3.6
