@@ -21,3 +21,4 @@ input="INPUT"
 python kmeans_predict.py $input $output
 python cluster_analysis.py $input $output
 python contour_images.py $input $output
+python purge_files.py $input $output
