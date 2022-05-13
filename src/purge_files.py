@@ -8,6 +8,7 @@ try:
     base_path = os.path.join(out_path, basename)
     last_run = sorted(os.listdir(base_path), reverse=True)[0]
     mask_path = os.path.join(base_path, last_run, "extracted_features.pickle")
+    data_path = os.path.join(base_path, last_run, "data.csv")
     label_path = os.path.join(base_path, last_run, "labels.pickle")
 except:
     print("Received invalid image_path. Make sure you execute with:")
@@ -17,6 +18,10 @@ except:
 if os.path.exists(mask_path):
     os.remove(mask_path)
     print("Purged %s." % mask_path)
+
+if os.path.exists(data_path):
+    os.remove(data_path)
+    print("Purged %s." % data_path)
 
 if os.path.exists(label_path):
     os.remove(label_path)
