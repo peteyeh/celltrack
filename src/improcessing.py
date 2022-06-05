@@ -77,7 +77,8 @@ def scale_image(image, max_value=255, mode=90):
         target_max = max_value - mode
         target_min = 0 - mode
         image[image > 0] *= (target_max / image.max())
-        image[image < 0] *= (target_min / image.min())
+        if image.min() != 0: # this avoids a divide-by-zero warning
+            image[image < 0] *= (target_min / image.min())
 
         image += mode
         image = np.around(image)  # Need to remove rounding error first

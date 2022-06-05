@@ -50,8 +50,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if len(image_stack) != len(mask_result) or len(image_stack) != len(label_result):
-    	print("Unable to match image stack to saved mask and label data. Aborting.")
-    	sys.exit(1)
+        print("Unable to match image stack to saved mask and label data. Aborting.")
+        sys.exit(1)
 
     print("Creating %i contoured images for %s:" % (len(image_stack), basename))
     args = zip(image_stack, mask_result, label_result, [get_colormap()]*len(image_stack))
