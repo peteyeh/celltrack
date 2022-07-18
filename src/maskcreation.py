@@ -196,7 +196,7 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=2
         true_mask = get_mask_image(image, {'mode': mode, 'params': params}, verbosity)
         if not validate_mask(true_mask):
             if prev_true is not None:
-                return prev_true
+                return prev_true, offset-1
             continue
 
         test_params = params.copy()
@@ -205,7 +205,7 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=2
         test_mask = get_mask_image(image, {'mode': mode, 'params': test_params}, verbosity)
         if not validate_mask(test_mask, cutoff=0.4):
             if prev_true is not None:
-                return prev_true
+                return prev_true, offset-1
             continue
 
         if prev_true is not None and prev_test is not None:
@@ -216,11 +216,11 @@ def get_mask_image_with_refined_offset(image, mask_params=default_params, left=2
             # could also check for num_components > 1 instead of np.any for speed, but this is cleaner
             if np.any(true_diff) and np.any(test_diff) and \
                (max_true_diff > 10000 or (max_true_diff > 2000 and max_test_diff > 5000)):
-                return prev_true
+                return prev_true, offset-1
 
         prev_true = true_mask
         prev_test = test_mask
-    return true_mask
+    return true_mask, search_range[-1]
 
 def validate_mask(mask_image, cutoff=0.15):
     # if nothing is masked or if everything is masked
@@ -244,9 +244,12 @@ if __name__ == "__main__":
 
     basename = os.path.basename(sys.argv[1]).split('.')[0]
     print("Creating %i mask images for %s:" % (len(image_stack), basename))
-    mask_images = \
+    result = \
         Parallel(n_jobs=cpu_count())(
             delayed(get_mask_image_with_refined_offset)(_) for _ in tqdm(image_stack))
+
+    mask_images = [r[0] for r in result]
+    print("Selected offsets: " + str([r[1] for r in result]))
 
     try:
         if not np.isin(mask_images, [0,1]).all():
