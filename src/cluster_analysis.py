@@ -25,6 +25,10 @@ if __name__ == "__main__":
     out_path = "." if len(sys.argv) < 3 else sys.argv[2]  # this directory should already exist
 
     try:
+        base_path = os.path.join(out_path, "kmeans")
+        last_run = sorted(os.listdir(base_path), reverse=True)[0]
+        kmeans_path = os.path.join(base_path, last_run)  # ".pickle" is contained within last_run
+
         base_path = os.path.join(out_path, os.path.basename(sys.argv[1]).split('.')[0])
         last_run = sorted(os.listdir(base_path), reverse=True)[0]
         mask_path = os.path.join(base_path, last_run, "extracted_features.pickle")
@@ -43,6 +47,14 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
+        with open(kmeans_path, "rb") as infile:
+            _, _, kmeans = pickle.load(infile)
+            print("Loaded models from " + kmeans_path + ".")
+    except:
+        print("Unable to load models from %s. Did you run kmeans_initialize.py?" % kmeans_path)
+        sys.exit(1)
+
+    try:
         with open(label_path, "rb") as infile:
             label_result = pickle.load(infile)
             print("Loaded labels from %s." % label_path)
@@ -50,9 +62,7 @@ if __name__ == "__main__":
         print("Unable to load labels from %s. Did you run kmeans_predict.py?" % label_path)
         sys.exit(1)
 
-    nc = 1
-    for l in label_result:
-        nc = max(nc, max(l)+1)
+    nc = kmeans.get_params()['n_clusters']
     counts = np.zeros((len(label_result), nc))
     total_sizes = np.zeros((len(label_result), nc))
     mean_sizes = np.zeros((len(label_result), nc))
