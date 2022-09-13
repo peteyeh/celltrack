@@ -13,9 +13,9 @@ This repository contains an cell image processing pipeline which can be run with
 First, we need to clone the github repository into a directory within Quest::
 
     git clone https://github.com/peteyeh/celltrack
+    cd celltrack
 
-
-Next we need to install libaries/dependencies that Quest will need to run our Python scripts. A handy `script <https://github.com/peteyeh/celltrack/blob/master/reference/quest_initialize.sh>`_ is included within this repository to automate this process using Anaconda, which is `pre-installed on Quest <https://kb.northwestern.edu/page.php?id=78623>`_::
+Next we need to install libaries/dependencies that Quest will need to run our Python scripts. A handy `script <https://github.com/peteyeh/celltrack/blob/master/reference/quest_initialize.sh>`_ is included within this repository to automate this process using Anaconda, which is `pre-installed on Quest <https://kb.northwestern.edu/page.php?id=78623>`_.::
 
     cd reference
     bash quest_initialize.sh
@@ -27,7 +27,7 @@ In order for Quest jobs to run smoothly we need to ensure that our input and out
 
 Output Directory
 ****************
-The intended output directory is hard-coded into template scripts in the reference directory (see `reference/base_mc_fe.sh <https://github.com/peteyeh/celltrack/blob/master/reference/base_mc_fe.sh>`_, `reference/base_km.sh <https://github.com/peteyeh/celltrack/blob/master/reference/base_km.sh>`_, and `reference/base_kp_ca_ci.sh <https://github.com/peteyeh/celltrack/blob/master/reference/base_kp_ca_ci.sh>`_). For example, you should see a line with the output directory ``/projects/p31689/Image_Analysis/output`` specified::
+The intended output directory is hard-coded into template scripts in the reference directory (see `reference/base_mc_fe.sh <https://github.com/peteyeh/celltrack/blob/master/reference/base_mc_fe.sh>`_, `reference/base_km.sh <https://github.com/peteyeh/celltrack/blob/master/reference/base_km.sh>`_, and `reference/base_kp_ca_ci.sh <https://github.com/peteyeh/celltrack/blob/master/reference/base_kp_ca_ci.sh>`_). In each template script you should see a line with the output directory (by default ``/projects/p31689/Image_Analysis/output``) specified::
 
     output="/projects/p31689/Image_Analysis/output"
 
@@ -35,9 +35,13 @@ This output directory can be changed to any arbitrary directory within Quest, bu
 
 Quest Allocation
 ****************
-While we're here, we should ensure that the allocation (by default ``p31689``) used to submit Quest jobs is up to date in each template script::
+While we're here in the reference templates, we should ensure that the allocation (by default ``p31689``) used to submit Quest jobs is up to date in each template script::
 
     #SBATCH --account=p31689
+
+The remainder of the pipeline will be run from the ``src/`` directory, so let's navigate to it now::
+
+    cd ../src
 
 Input Directory
 ***************
@@ -52,7 +56,7 @@ We now should have everything we need to submit jobs to Quest. Our pipeline curr
 
 Mask Creation and Feature Extraction
 **********************************
-Once the ``manifest.txt`` file is specified we can execute a simple command::
+Once ``manifest.txt`` is specified we can execute a simple command::
 
     bash extract_features.sh
 
