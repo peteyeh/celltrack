@@ -68,7 +68,9 @@ K-Means Initialization *[if a k-means model has not yet been trained]*
 **********************************************************************
 This step should ideally only be run once, to initialize a trained k-means model which will be used to classify all subsequent image stacks. ``manifest.txt`` should be updated to include 1+ representative image stacks, and ``extract_features.sh`` should be run as above on these image stacks if not already. Then, we can execute::
 
-    bash initialize_kmeans.sh
+    bash initialize_kmeans.sh [number of clusters]
+
+If ``[number of clusters]`` is omitted, this script will scan through a range of possible *k* and generate a plot of Silhouette scores to be used as guidance. The script will then need to be re-run with the chosen number of clusters.
 
 Note that this script is unlike the others, as it will submit **one** job to Quest that aggregates all images from all image stacks to train a single model. Thus, ideally we should be selective about the number of image stacks to include (~5 is probably reasonable) as too many will result in prohibitively long runtimes.
 
